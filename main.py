@@ -35,13 +35,22 @@ pisXPos = [10 + (460 / 18) * i for i in range(19)]
 pisYPos = [10 + (460 / 18) * i for i in range(19)]
 
 run = True
+numberingRun = False
 order = 1
 pieces = []
 
 clock = pygame.time.Clock()
 
-def setWindow():
-    screen = pygame.display.set_mode((screen_width, screen_height))
+def numbering():
+    for i, piece in enumerate(pieces):
+        if i % 2 != 0:
+            numbering = numberingFont.render(str(i + 1), True, BLACK)
+        else:
+            numbering = numberingFont.render(str(i + 1), True, WHITE)
+        screen.blit(numbering, numbering.get_rect(center=[pieces[i][0], pieces[i][1]]))
+
+def setWindow(): #todo 버튼 그래픽 추가 (undo, redo, numbering, new game, quit)
+    screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
     pygame.display.set_caption("omok!!!")
     screen.fill((165, 138, 0))
     screen.fill((204, 102, 0), (10, 10, 460, 460))
@@ -49,6 +58,18 @@ def setWindow():
         pygame.draw.line(screen, BLACK, [10 + (460 / 18) * i, 10], [10 + (460 / 18) * i, 470])
         pygame.draw.line(screen, BLACK, [10, 10 + (460 / 18) * i], [470, 10 + (460 / 18) * i])
     return screen
+
+def renderMenu():
+    undoMenu = menuFont.render("UNDO", True, BLACK)
+    redoMenu = menuFont.render("REDO", True, BLACK)
+    numberingMenu = menuFont.render("NUMBERING", True, BLACK)
+    newGameMenu = menuFont.render("NEW GAME", True, BLACK)
+    quitMenu = menuFont.render("QUIT", True, BLACK)
+    screen.blit(undoMenu, undoMenu.get_rect(center=[560, 205]))
+    screen.blit(redoMenu, redoMenu.get_rect(center=[560, 265]))
+    screen.blit(numberingMenu, numberingMenu.get_rect(center=[560, 325]))
+    screen.blit(newGameMenu, newGameMenu.get_rect(center=[560, 385]))
+    screen.blit(quitMenu, quitMenu.get_rect(center=[560, 445]))
 
 def whereClick(xpos):
     if xpos <= 475:
@@ -80,14 +101,37 @@ def ㅡShapeWin(): # ㅡ모양 검사
                     pass
             else:
                 pass
-def lShapeWin(): #todo l모양 승리 조건함수 완성하기
-    pass
+def lShapeWin():
+    for y in range(15):
+        for x in range(19):
+            if charBoard[y][x] != 0:
+                if charBoard[y][x] == charBoard[y + 1][x] == charBoard[y + 2][x] == charBoard[y + 3][x] == charBoard[y + 4][x]:
+                    return ['win', charBoard[y][x]]
+                else:
+                    pass
+            else:
+                pass
 
-def xShapeWin(): #todo 대각선 모양 승리조건함수 완성하기
-    pass
+def xShapeWin():
+    for y in range(15):
+        for x in range(19):
+            if charBoard[y][x] != 0:
+                if charBoard[y][x] == charBoard[y + 1][x + 1] == charBoard[y + 2][x + 2] == charBoard[y + 3][x + 3] == charBoard[y + 4][x + 4] or charBoard[y][x] == charBoard[y + 1][x - 1] == charBoard[y + 2][x - 2] == charBoard[y + 3][x - 3] == charBoard[y + 4][x - 4]:
+                    return ['win', charBoard[y][x]]
+                else:
+                    pass
+            else:
+                pass
+
+def calResult():
+    r = ㅡShapeWin() or lShapeWin() or xShapeWin()
+    return r
 
 if __name__ == '__main__':
     pygame.init()
+
+    numberingFont = pygame.font.SysFont("arial", 15, True, False)
+    menuFont = pygame.font.SysFont("arial", 20, True, False)
 
     clock.tick(30)
 
@@ -100,29 +144,45 @@ if __name__ == '__main__':
             elif e.type == pygame.MOUSEBUTTONUP:
                 pos = list(pygame.mouse.get_pos())
                 if whereClick(pos[0]) == 'board':
-                    setPos = setPiecePos(pos[0], pos[1])
-                    pieces.append([setPos[0], setPos[1], order])
-                    x = pisXPos.index(setPos[0])
-                    y = pisYPos.index(setPos[1])
-                    if order % 2 != 0:
-                        charBoard[y][x] = 1
-                    else:
-                        charBoard[y][x] = 2
-                    # drawPiece(pos[0], pos[1])
-                    order += 1
-                else:
                     try:
-                        x = pisXPos.index(pieces[-1][0])
-                        y = pisYPos.index(pieces[-1][1])
-                        charBoard[y][x] = 0
-                        del pieces[-1]
-                        order -= 1
+                        setPos = setPiecePos(pos[0], pos[1])
+                        x = pisXPos.index(setPos[0])
+                        y = pisYPos.index(setPos[1])
+                        if order % 2 != 0 and charBoard[y][x] == 0:
+                            charBoard[y][x] = 1
+                            pieces.append([setPos[0], setPos[1], order])
+                            order += 1
+                        elif order % 2 == 0 and charBoard[y][x] == 0:
+                            charBoard[y][x] = 2
+                            pieces.append([setPos[0], setPos[1], order])
+                            order += 1
                     except:
                         pass
+                    else:
+                        pass
+                else: #todo 메뉴클릭구현
+
+                    # print(redoMenu.get_rect()) ##################### 메뉴구역설정 방법
+                    # my_text = my_font.render("STRING", 1, (0, 0, 0))
+                    # text_width = my_text.get_width()
+                    # text_height = my_text.get_height()
+                    #
+                    # screen.blit(my_text, (screen_width // 2 - text_width // 2, screen_height // 2 - text_height // 2)
+
+                    # try: # undo기능
+                    #     x = pisXPos.index(pieces[-1][0])
+                    #     y = pisYPos.index(pieces[-1][1])
+                    #     charBoard[y][x] = 0
+                    #     del pieces[-1]
+                    #     order -= 1
+                    # except:
+                    #     pass
+
+                    numberingRun = not numberingRun # numbering기능설정
             setWindow()
             for p in pieces:
                 drawPiece(p[0], p[1], p[2])
-            result = ㅡShapeWin()
+            result = calResult()
             try:
                 if result[0] == 'win':
                     if result[1] == 1:
@@ -134,5 +194,7 @@ if __name__ == '__main__':
                     pass
             except:
                 pass
-
+        if numberingRun:
+            numbering()
+        renderMenu()
         pygame.display.update()
