@@ -1,3 +1,5 @@
+import pprint
+
 import pygame
 
 screen_width = 640
@@ -59,17 +61,17 @@ def setWindow(): #todo 버튼 그래픽 추가 (undo, redo, numbering, new game,
         pygame.draw.line(screen, BLACK, [10, 10 + (460 / 18) * i], [470, 10 + (460 / 18) * i])
     return screen
 
-def renderMenu():
+def renderMenu(): #todo undoMenu, (531, 315, 58, 23), redoMenu, (532, 348, 57, 23), numberingMenu, (499, 381, 122, 23), newGameMenu, (504, 414, 112, 23), quitMenu, (536, 447, 48, 23)
     undoMenu = menuFont.render("UNDO", True, BLACK)
     redoMenu = menuFont.render("REDO", True, BLACK)
     numberingMenu = menuFont.render("NUMBERING", True, BLACK)
     newGameMenu = menuFont.render("NEW GAME", True, BLACK)
     quitMenu = menuFont.render("QUIT", True, BLACK)
-    screen.blit(undoMenu, undoMenu.get_rect(center=[560, 205]))
-    screen.blit(redoMenu, redoMenu.get_rect(center=[560, 265]))
-    screen.blit(numberingMenu, numberingMenu.get_rect(center=[560, 325]))
-    screen.blit(newGameMenu, newGameMenu.get_rect(center=[560, 385]))
-    screen.blit(quitMenu, quitMenu.get_rect(center=[560, 445]))
+    screen.blit(undoMenu, (531, 315, 58, 23))
+    screen.blit(redoMenu, (532, 348, 57, 23))
+    screen.blit(numberingMenu, (499, 381, 122, 23))
+    screen.blit(newGameMenu, (504, 414, 112, 23))
+    screen.blit(quitMenu, (536, 447, 48, 23))
 
 def whereClick(xpos):
     if xpos <= 475:
@@ -88,15 +90,17 @@ def setPiecePos(xpos, ypos): # 바둑알 위치 조정 함수
 def drawPiece(xpos, ypos, order):
     if order % 2 != 0:
         pygame.draw.circle(screen, BLACK, [xpos, ypos], 10)
+        pprint.pprint(tempBoard)
     else:
         pygame.draw.circle(screen, WHITE, [xpos, ypos], 10)
+        pprint.pprint(tempBoard)
 
 def ㅡShapeWin(): # ㅡ모양 검사
     for y in range(19):
         for x in range(15):
-            if charBoard[y][x] != 0:
-                if charBoard[y][x] == charBoard[y][x + 1] == charBoard[y][x + 2] == charBoard[y][x + 3] == charBoard[y][x + 4]:
-                    return ['win', charBoard[y][x]]
+            if tempBoard[y][x] != 0:
+                if tempBoard[y][x] == tempBoard[y][x + 1] == tempBoard[y][x + 2] == tempBoard[y][x + 3] == tempBoard[y][x + 4]:
+                    return ['win', tempBoard[y][x]]
                 else:
                     pass
             else:
@@ -104,9 +108,9 @@ def ㅡShapeWin(): # ㅡ모양 검사
 def lShapeWin():
     for y in range(15):
         for x in range(19):
-            if charBoard[y][x] != 0:
-                if charBoard[y][x] == charBoard[y + 1][x] == charBoard[y + 2][x] == charBoard[y + 3][x] == charBoard[y + 4][x]:
-                    return ['win', charBoard[y][x]]
+            if tempBoard[y][x] != 0:
+                if tempBoard[y][x] == tempBoard[y + 1][x] == tempBoard[y + 2][x] == tempBoard[y + 3][x] == tempBoard[y + 4][x]:
+                    return ['win', tempBoard[y][x]]
                 else:
                     pass
             else:
@@ -114,10 +118,12 @@ def lShapeWin():
 
 def xShapeWin():
     for y in range(15):
-        for x in range(19):
-            if charBoard[y][x] != 0:
-                if charBoard[y][x] == charBoard[y + 1][x + 1] == charBoard[y + 2][x + 2] == charBoard[y + 3][x + 3] == charBoard[y + 4][x + 4] or charBoard[y][x] == charBoard[y + 1][x - 1] == charBoard[y + 2][x - 2] == charBoard[y + 3][x - 3] == charBoard[y + 4][x - 4]:
-                    return ['win', charBoard[y][x]]
+        for x in range(15):
+            if tempBoard[y][x] != 0:
+                if tempBoard[y][x] == tempBoard[y + 1][x + 1] == tempBoard[y + 2][x + 2] == tempBoard[y + 3][x + 3] == tempBoard[y + 4][x + 4]: #todo \방향 검사
+                    return ['win', tempBoard[y][x]]
+                elif tempBoard[y + 4][x] == tempBoard[y - 1][x + 1] == tempBoard[y - 2][x + 2] == tempBoard[y - 3][x + 3] == tempBoard[y - 4][x + 4]: #todo /방향 검사
+                    return ['win', tempBoard[y][x]]
                 else:
                     pass
             else:
@@ -127,8 +133,23 @@ def calResult():
     r = ㅡShapeWin() or lShapeWin() or xShapeWin()
     return r
 
+def menuClick(ypos):
+    global numberingRun
+    if 315 <= ypos <= 338:
+        undo()
+    elif 348 <= ypos <= 371:
+        redo()
+    elif 381 <= ypos <= 404:
+        numberingRun = not numberingRun
+    elif 414 <= ypos <= 437:
+        tempBoard = charBoard
+    elif 447 <= ypos <= 70:
+        redo()
+
 if __name__ == '__main__':
     pygame.init()
+
+    tempBoard = charBoard
 
     numberingFont = pygame.font.SysFont("arial", 15, True, False)
     menuFont = pygame.font.SysFont("arial", 20, True, False)
@@ -148,12 +169,12 @@ if __name__ == '__main__':
                         setPos = setPiecePos(pos[0], pos[1])
                         x = pisXPos.index(setPos[0])
                         y = pisYPos.index(setPos[1])
-                        if order % 2 != 0 and charBoard[y][x] == 0:
-                            charBoard[y][x] = 1
+                        if order % 2 != 0 and tempBoard[y][x] == 0:
+                            tempBoard[y][x] = 1
                             pieces.append([setPos[0], setPos[1], order])
                             order += 1
-                        elif order % 2 == 0 and charBoard[y][x] == 0:
-                            charBoard[y][x] = 2
+                        elif order % 2 == 0 and tempBoard[y][x] == 0:
+                            tempBoard[y][x] = 2
                             pieces.append([setPos[0], setPos[1], order])
                             order += 1
                     except:
@@ -161,7 +182,7 @@ if __name__ == '__main__':
                     else:
                         pass
                 else: #todo 메뉴클릭구현
-
+                        menuClick(pos[1])
                     # print(redoMenu.get_rect()) ##################### 메뉴구역설정 방법
                     # my_text = my_font.render("STRING", 1, (0, 0, 0))
                     # text_width = my_text.get_width()
@@ -178,7 +199,6 @@ if __name__ == '__main__':
                     # except:
                     #     pass
 
-                    numberingRun = not numberingRun # numbering기능설정
             setWindow()
             for p in pieces:
                 drawPiece(p[0], p[1], p[2])
