@@ -1,6 +1,5 @@
-import pprint
-
-import pygame
+import subprocess
+import sys
 
 screen_width = 640
 screen_height = 480
@@ -40,7 +39,8 @@ numberingRun = False
 order = 1
 pieces = []
 
-clock = pygame.time.Clock()
+def checkModule():
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pygame"])
 
 def numbering():
     for i, piece in enumerate(pieces):
@@ -157,9 +157,11 @@ def undo():
         pass
 
 def redo():
+    global order
     try:
         pieces.append(redoList[-1])
         del redoList[-1]
+        order += 1
     except:
         pass
 
@@ -185,6 +187,13 @@ def menuClick(ypos):
         run = False
 
 if __name__ == '__main__':
+
+    checkModule()
+
+    pygame = __import__('pygame')
+
+    clock = pygame.time.Clock()
+
     pygame.init()
 
     tempBoard = charBoard
