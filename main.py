@@ -122,7 +122,7 @@ def xShapeWin():
                     return ['win', tempBoard[y][x]]
                 else:
                     pass
-            elif tempBoard[y + 4][x] != 0:
+            if tempBoard[y + 4][x] != 0:
                 if tempBoard[y + 4][x] == tempBoard[y + 3][x + 1] == tempBoard[y + 2][x + 2] == \
                         tempBoard[y + 1][x + 3] == tempBoard[y][x + 4]:  # todo /방향 검사
                     return ['win', tempBoard[y + 4][x]]
@@ -136,8 +136,9 @@ def calResult():
     return r
 
 def resetBoard():
-    global pieces
+    global pieces, order
     pieces = []
+    order = 1
     for x in range(19):
         for y in range(19):
             charBoard[y][x] = 0

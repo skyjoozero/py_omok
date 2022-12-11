@@ -1,6 +1,6 @@
 @echo off
 
-set "VIRTUAL_ENV=C:\Users\user\Desktop\py_omok\venv"
+set "VIRTUAL_ENV=C:\Users\skyjoozero\Desktop\py_omok\venv"
 
 if defined _OLD_VIRTUAL_PROMPT (
     set "PROMPT=%_OLD_VIRTUAL_PROMPT%"
