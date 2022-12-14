@@ -52,7 +52,7 @@ def numbering():
 
 def setWindow(): #todo 버튼 그래픽 추가 (undo, redo, numbering, new game, quit)
     screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
-    pygame.display.set_caption("omok!!!")
+    pygame.display.set_caption('오목')
     screen.fill((165, 138, 0))
     screen.fill((204, 102, 0), (10, 10, 460, 460))
     for i in range(19):
@@ -92,7 +92,7 @@ def drawPiece(xpos, ypos, order):
     else:
         pygame.draw.circle(screen, WHITE, [xpos, ypos], 10)
 
-def ㅡShapeWin(): # ㅡ모양 검사
+def horizontalShapeWin(): # ㅡ모양 검사
     for y in range(19):
         for x in range(15):
             if tempBoard[y][x] != 0:
@@ -102,7 +102,7 @@ def ㅡShapeWin(): # ㅡ모양 검사
                     pass
             else:
                 pass
-def lShapeWin():
+def verticalShapeWin():
     for y in range(15):
         for x in range(19):
             if tempBoard[y][x] != 0:
@@ -132,7 +132,7 @@ def xShapeWin():
                 pass
 
 def calResult():
-    r = ㅡShapeWin() or lShapeWin() or xShapeWin()
+    r = horizontalShapeWin() or verticalShapeWin() or xShapeWin()
     return r
 
 def resetBoard():
@@ -169,21 +169,16 @@ def redo():
 def menuClick(ypos):
     global numberingRun
     global tempBoard
-    if 315 <= ypos <= 338:
-        print("clicked undo")
+    if 315 <= ypos <= 338: #undo
         undo()
-    elif 348 <= ypos <= 371:
-        print("clicked redo")
+    elif 348 <= ypos <= 371: #redo
         redo()
-    elif 381 <= ypos <= 404:
-        print("clicked numbering")
+    elif 381 <= ypos <= 404: #numbering
         numberingRun = not numberingRun
-    elif 414 <= ypos <= 437:
-        print("clicked new game")
+    elif 414 <= ypos <= 437: #new game
         numberingRun = False
         resetBoard() #todo 다시하기 기능 만들기
-    elif 447 <= ypos <= 470:
-        print("clicked quit")
+    elif 447 <= ypos <= 470: #quit
         global run
         run = False
 
